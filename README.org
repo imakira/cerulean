@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fimakira%2Fcerulean.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fimakira%2Fcerulean?ref=badge_shield)
+
 * Work in Progress
 
 * Project Goals
@@ -13,3 +15,7 @@
     - Select CJK font correctly depending on a page's language
       Check https://heistak.github.io/your-code-displays-japanese-wrong/
     - Filter articles by language? Multiple versions with different langauge for the same article?
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fimakira%2Fcerulean.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fimakira%2Fcerulean?ref=badge_large)
