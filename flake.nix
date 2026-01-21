@@ -69,6 +69,15 @@
           pkgs.dockerTools.usrBinEnv
         ];
 
+        dev-deps = with pkgs; [
+          jdk25_headless
+          (pkgs.clojure.override{jdk=pkgs.jdk25_headless;})
+        ];
+
+        ci-deps = with pkgs; [
+          gnupg
+        ];
+
         npmDeps = pkgs.buildNpmPackage(finalAttrs: {
           src = self;
           pname = "cerulean-npm-deps";
@@ -146,9 +155,10 @@
           );
         };
         devShells.default = pkgs.mkShell {
-          packages =  [
-            (pkgs.clojure.override{jdk=pkgs.jdk25_headless;})
-          ] ++ deps;
+          packages =  [] ++ deps ++ dev-deps;
+        };
+        devShells.ci = pkgs.mkShell {
+          packages =  [] ++ deps ++ dev-deps ++ ci-deps;
         };
       }
     );

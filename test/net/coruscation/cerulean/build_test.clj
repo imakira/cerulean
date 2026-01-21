@@ -29,11 +29,11 @@
                      {:err (logging/log-stream :info *ns*)
                       :out (logging/log-stream :info *ns*)})
       (test-utils/with-temp-workspace
-        (process/shell (str "docker run --rm -it --user " uid ":" gid " -v ./:/cerulean/workspace cerulean:latest init")
+        (process/shell (str "docker run --rm --user " uid ":" gid " -v ./:/cerulean/workspace cerulean:latest init")
                        {:dir config/*workspace*
                         :err (logging/log-stream :error *ns*)
                         :out (logging/log-stream :info *ns*)})
-        (process/shell (str "docker run --rm -it --user " uid ":" gid " -v ./:/cerulean/workspace cerulean:latest build")
+        (process/shell (str "docker run --rm --user " uid ":" gid " -v ./:/cerulean/workspace cerulean:latest build")
                        {:dir config/*workspace*
                         :err (logging/log-stream :error *ns*)
                         :out (logging/log-stream :info *ns*)})
