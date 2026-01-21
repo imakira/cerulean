@@ -25,7 +25,7 @@
   (testing ""
     (let [uid (.trim (:out (process/sh "id -u")))
           gid (.trim (:out (process/sh "id -g")))]
-      (process/shell "make docker-build-and-load-dev"
+      (process/shell "make docker-build-and-load"
                      {:err (logging/log-stream :info *ns*)
                       :out (logging/log-stream :info *ns*)})
       (test-utils/with-temp-workspace
