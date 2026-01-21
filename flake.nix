@@ -155,10 +155,16 @@
           );
         };
         devShells.default = pkgs.mkShell {
-          packages =  [] ++ deps ++ dev-deps;
+          inherit npmDeps;
+          packages =  [
+            pkgs.importNpmLock.hooks.linkNodeModulesHook
+          ] ++ deps ++ dev-deps;
         };
         devShells.ci = pkgs.mkShell {
-          packages =  [] ++ deps ++ dev-deps ++ ci-deps;
+          inherit npmDeps;
+          packages =  [
+            pkgs.importNpmLock.hooks.linkNodeModulesHook
+          ] ++ deps ++ dev-deps ++ ci-deps;
         };
       }
     );
