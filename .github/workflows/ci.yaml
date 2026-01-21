@@ -41,6 +41,12 @@ jobs:
                 extra_nix_config: |
                   access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
+            - name: Set git name 
+              run: git config --global user.name "cerulean-ci"
+
+            - name: Set git email
+              run: git config --global user.email "ci@coruscation.net"
+
             - name: Running Tests
               shell: 'nix develop .#ci -c bash -e {0}'
               run: make test-all
