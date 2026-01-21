@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
     build:
+        environment: env
         runs-on: ubuntu-latest
         steps:
             - uses: nixbuild/nix-quick-install-action@v30
