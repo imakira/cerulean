@@ -102,5 +102,5 @@
 
 (deftest simple-test
   (let [result (org-file->html (path-join test-resources-dir "simple-orgx.org"))]
-    (is (= 2026 (zoned-date-time/get-year (:published-date result))))
-    (is (= "2026-01-23T20:30:30Z" (commons/to-iso8601 (:modified-date result))))))
+    (is (= 2026 (zoned-date-time/get-year (commons/parse-iso8601 (:published-date result)))))
+    (is (= "2026-01-23T20:30:30Z" (:modified-date result)))))
