@@ -200,14 +200,16 @@
               :category category
               :tags (if tags (str/split tags #" ") [])
               :email email
-              :published-date (if (not (empty? published_date))
-                                (commons/parse-timestamp published_date)
-                                (if (not (empty? date))
-                                  (commons/parse-timestamp date)
-                                  nil))
-              :modified-date (if (not (empty? modified_date))
-                               (commons/parse-timestamp modified_date)
-                               nil)
+              :published-date (some-> (if (not (empty? published_date))
+                                        (commons/parse-timestamp published_date)
+                                        (if (not (empty? date))
+                                          (commons/parse-timestamp date)
+                                          nil))
+                                      commons/to-iso8601)
+              :modified-date (some-> (if (not (empty? modified_date))
+                                       (commons/parse-timestamp modified_date)
+                                       nil)
+                                     commons/to-iso8601)
               :language language
               :author author
               :orgx (boolean orgx)
