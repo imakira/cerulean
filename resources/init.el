@@ -41,7 +41,7 @@
                              "language"
                              "author" "description"
                              "orgx_require" "orgx"
-                             "unlisted"))
+                             "unlisted" "date" "published_date" "modified_date"))
                  (kvs (org-collect-keywords keywords)))
             (with-current-buffer blog-buffer
 

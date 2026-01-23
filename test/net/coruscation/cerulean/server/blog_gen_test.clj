@@ -1,12 +1,14 @@
 (ns net.coruscation.cerulean.server.blog-gen-test
   (:require
+   [cljc.java-time.zoned-date-time :as zoned-date-time]
    [clojure.java.io :as io]
    [clojure.test :refer [deftest is testing use-fixtures]]
    [hickory.core :as core]
-   [net.coruscation.cerulean.test-constants :as constants]
+   [net.coruscation.cerulean.common.commons :as commons]
    [net.coruscation.cerulean.server.blog-gen :as subject :refer [org-file->html]]
    [net.coruscation.cerulean.server.utils :refer [path-join]]
-   [net.coruscation.cerulean.test-utils :refer [temp-workspace-fixture with-temp-workspace]]))
+   [net.coruscation.cerulean.test-constants :as constants]
+   [net.coruscation.cerulean.test-utils :refer [temp-workspace-fixture]]))
 
 (use-fixtures :each temp-workspace-fixture)
 
@@ -96,3 +98,9 @@
              (:orgx-require demo)))
       (is (true? (:orgx demo))))))
 
+
+
+(deftest simple-test
+  (let [result (org-file->html (path-join test-resources-dir "simple-orgx.org"))]
+    (is (= 2026 (zoned-date-time/get-year (:published-date result))))
+    (is (= "2026-01-23T20:30:30Z" (commons/to-iso8601 (:modified-date result))))))

@@ -10,6 +10,7 @@
    [hickory.render :as hr]
    [hickory.select :as hs]
    [hickory.zip :as hz]
+   [net.coruscation.cerulean.common.commons :as commons]
    [net.coruscation.cerulean.config :as config]
    [net.coruscation.cerulean.server.code-highlight :as code-highlight]
    [net.coruscation.cerulean.server.emacs-ipc :as eipc]
@@ -175,7 +176,8 @@
 
 (defn org-file->html [path]
   (eipc/init-emacs!)
-  (let [{:keys [content title category tags email language author description orgx orgx_require unlisted] :as result}
+  (let [{:keys [content title category tags email language author description orgx orgx_require unlisted
+                date published_date modified_date] :as result}
         (eipc/elisp-funcall! :org->html path)
 
         hickory-blocks (->> content
@@ -198,6 +200,14 @@
               :category category
               :tags (if tags (str/split tags #" ") [])
               :email email
+              :published-date (if (not (empty? published_date))
+                                (commons/parse-timestamp published_date)
+                                (if (not (empty? date))
+                                  (commons/parse-timestamp date)
+                                  nil))
+              :modified-date (if (not (empty? modified_date))
+                               (commons/parse-timestamp modified_date)
+                               nil)
               :language language
               :author author
               :orgx (boolean orgx)
