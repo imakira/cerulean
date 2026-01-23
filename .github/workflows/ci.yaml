@@ -52,8 +52,3 @@ jobs:
               shell: 'nix develop .#ci -c bash -e {0}'
               run: make test-all
 
-            - name: Publish Docker Images
-              shell: 'nix develop .#ci -c bash -e {0}'
-              run: make docker-publish
-              env:
-                CERULEAN_PASSPHRASE: ${{ secrets.CERULEAN_PASSPHRASE }}
