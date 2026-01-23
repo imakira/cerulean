@@ -5,10 +5,7 @@
    [cljc.java-time.local-date-time :as local-date-time]
    [cljc.java-time.local-time :as local-time]
    [cljc.java-time.zone-id :as zone-id]
-   [cljc.java-time.zoned-date-time :as zoned-date-time])
-  (:import
-   [java.lang Throwable]))
-
+   [cljc.java-time.zoned-date-time :as zoned-date-time]))
 
 (defn index-by
   [f coll]
@@ -37,9 +34,11 @@
   [timestr]
   (try
     (parse-iso8601 timestr)
-    (catch Throwable _
+    (catch #?(:clj java.lang.Throwable
+              :cljs js/Error) _
       (try (parse-org-timestamp timestr)
-           (catch Throwable _
+           (catch #?(:clj java.lang.Throwable
+                     :cljs js/Error) _
              (throw (ex-info "Can not parse timestamp: "
                              {:timestamp timestr})))))))
 
