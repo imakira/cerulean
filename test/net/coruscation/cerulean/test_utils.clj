@@ -1,6 +1,7 @@
 (ns net.coruscation.cerulean.test-utils
   (:require
    [babashka.fs :as fs]
+   [cemerick.pomegranate :as pome]
    [cheshire.core :as cheshire]
    [clojure.java.io :as io]
    [clojure.test :refer [is]]
@@ -26,6 +27,11 @@
   (with-temp-workspace
     (test-run)))
 
+(defn ensure-dynamic-classloader-fixture [test-run]
+  (when (empty? (filter pome/modifiable-classloader? (pome/classloader-hierarchy (.getContextClassLoader (Thread/currentThread)))))
+    (let [cl (.getContextClassLoader (Thread/currentThread))]
+      (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. cl))))
+  (test-run))
 
 (defn verify-build-results [workspace]
   (with-workspace workspace

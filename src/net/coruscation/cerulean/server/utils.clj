@@ -1,10 +1,9 @@
 (ns net.coruscation.cerulean.server.utils
   (:require
-   [babashka.process :as process]
    [cemerick.pomegranate :as pome]
    [clojure.java.io :as io]
    [clojure.string :as str]
-   [clojure.tools.logging :as logging])
+   [net.coruscation.cerulean.common.commons :refer [call-once!]])
   (:import
    (java.nio.file Path)))
 
@@ -38,21 +37,23 @@
          (.toAbsolutePath)
          (.toString))))
 
-(defn add-to-classpath [path]
-  (let [path (-> (Path/of path (into-array String []))
-                 (.normalize)
-                 (.toAbsolutePath)
-                 (.toString))
-        shadow-property-name "java.class.path"]
-    (pome/add-classpath path)
-	(when (find-ns 'kaocha.classpath)
-      ((intern 'kaocha.classpath
-               'add-classpath)
-       path))
-    (if (nil? (System/getProperty shadow-property-name))
-      (System/setProperty shadow-property-name path)
-      (System/setProperty shadow-property-name
-                          (str path ":" (System/getProperty shadow-property-name))))))
+(def add-to-classpath
+  (call-once!
+   (fn [path]
+     (let [path (-> (Path/of path (into-array String []))
+                    (.normalize)
+                    (.toAbsolutePath)
+                    (.toString))
+           shadow-property-name "java.class.path"]
+       (pome/add-classpath path)
+       (when (find-ns 'kaocha.classpath)
+         ((intern 'kaocha.classpath
+                  'add-classpath)
+          path))
+       (if (nil? (System/getProperty shadow-property-name))
+         (System/setProperty shadow-property-name path)
+         (System/setProperty shadow-property-name
+                             (str path ":" (System/getProperty shadow-property-name))))))))
 
 (defn take-until
   [pred coll]

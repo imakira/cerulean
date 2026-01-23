@@ -44,3 +44,15 @@
 
 (defn to-iso8601 [zdt]
   (zoned-date-time/format zdt date-time-formatter/iso-offset-date-time))
+
+(defn call-once! [f]
+  (let [mem (atom {})]
+    (fn [& args]
+      (if-let [e (find @mem args)]
+        (val e)
+        (locking mem
+          (if-let [e (find @mem args)]
+            (val e)
+            (let [ret (apply f args)]
+              (swap! mem assoc args ret)
+              ret)))))))
