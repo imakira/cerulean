@@ -78,6 +78,13 @@
           gnupg
         ];
 
+        cerulean-custom-jdk = pkgs.customJdk {
+          cljDrv = clj-bin;
+          locales = "en";
+          jdkBase = pkgs.jdk25_headless;
+        };
+
+
         npmDeps = pkgs.buildNpmPackage(finalAttrs: {
           src = self;
           pname = "cerulean-npm-deps";
@@ -102,7 +109,7 @@
                 name = "cerulean";
                 text = ''
                 git config --global --add safe.directory /workspace
-                ${clj-bin}/bin/cerulean "$@"
+                ${cerulean-custom-jdk}/bin/cerulean "$@"
                 '';
               })
               pkgs.gnumake
@@ -123,7 +130,7 @@
               mkdir -p /root
               chmod 777 /tmp
               chmod 777 /root
-              ln -s "${deps-cache}/.m2" /root/.m2
+              # ln -s "${deps-cache}/.m2" /root/.m2
               mkdir -p /cerulean
               cp -r "${cerulean-src}"/* /cerulean/
               find -L /cerulean -type d -print0 | xargs -0 chmod ugo+rwx
@@ -153,7 +160,10 @@
               ];
             }
           );
+          cerulean-custom-jdk = cerulean-custom-jdk;
         };
+
+
         devShells.default = pkgs.mkShell {
           inherit npmDeps;
           packages =  [
