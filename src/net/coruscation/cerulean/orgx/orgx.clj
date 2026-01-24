@@ -95,12 +95,27 @@
   (loop [loc (zip/vector-zip hiccup)]
     (if (zip/end? loc)
       (zip/node loc)
-      (recur (zip/next
-              (if (and (string? (zip/node loc))
-                       (= (str/trim-newline (zip/node loc))
-                          ""))
-                (zip/remove loc)
-                loc))))))
+      (let [node (zip/node loc)]
+        (cond
+          ;; do not handle verbatim blocks
+	      (and (vector? node)
+               (or (= (first node)
+                      :pre)
+                   (= (first node)
+                      :node)
+                   (= (first node)
+                      :samp)))
+          (if (zip/right loc)
+            (recur (zip/right loc))
+            (zip/root loc))
+
+          (and (string? node)
+               (= (str/trim-newline node)
+                  ""))
+          (recur (zip/next (zip/remove loc)))
+
+          :else
+          (recur (zip/next loc)))))))
 
 (defn from-html [html]
   (let [results (->> (hickory.core/parse-fragment html)

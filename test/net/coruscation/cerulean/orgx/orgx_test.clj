@@ -4,14 +4,19 @@
    [clojure.java.io :as io]
    [clojure.test :refer [deftest is testing]]
    [clojure.tools.logging :as log]
+   [hickory.core :as hc]
    [kaocha.classpath :as kaocha.classpath]
    [net.coruscation.cerulean.config :refer [join-workspace-path]]
-   [net.coruscation.cerulean.orgx.orgx :as sut]
+   [net.coruscation.cerulean.orgx.orgx :as sut :refer [remove-extra-newline]]
    [net.coruscation.cerulean.server.utils :refer [add-to-classpath path-join]]
    [net.coruscation.cerulean.test-constants :refer [resources-dir]]
    [net.coruscation.cerulean.test-utils :refer [with-temp-workspace]]))
 
 (defonce test-resources-dir (path-join resources-dir "orgx-test"))
+
+(defn html->hiccup [htmlstr]
+  (->> (hc/parse-fragment htmlstr)
+       (mapv hc/as-hiccup)))
 
 (deftest from-html-test
   (testing
@@ -23,8 +28,8 @@
 (deftest toplevesl-test
   (testing
       (let [[_ toplevels] (sut/from-html "<pre class=\"orgx\" data-toplevel> (defui demo []) </pre> ")]
-        (is (= (str toplevels)
-               (str '((defui demo []))))))))
+        (is (= (str '((defui demo [])))
+               (str toplevels))))))
 
 (deftest load-orgx-test
   (testing
@@ -42,3 +47,14 @@
         (require (symbol "orgx.demo") :reload)
         (is (= 10 (var-get (intern (find-ns (symbol "orgx.demo"))
                                    'a)))))))
+
+(deftest remove-extra-newline-test
+  (is (= [[:p {} [:b {} "hello"]]]
+         (remove-extra-newline (html->hiccup "<p>
+<b>hello</b>
+</p>"))))
+  (is (= [[:pre {} "\n" [:b {} "hello"] "\n"]]
+         (remove-extra-newline (html->hiccup "<pre>
+
+<b>hello</b>
+</pre>")))))
