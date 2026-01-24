@@ -3,6 +3,7 @@
    [clojure.core.async :as a]
    [clojure.tools.logging :as logging]
    [net.coruscation.cerulean.check :as check]
+   [net.coruscation.cerulean.common.commons :refer [call-once!]]
    [net.coruscation.cerulean.common.pages :as pages]
    [net.coruscation.cerulean.config :as config]
    [net.coruscation.cerulean.orgx.orgx :as orgx]
@@ -61,10 +62,10 @@
     (when (:blog/orgx blog)
       (orgx/generate-cljc-from-blog blog))))
 
-(defonce maybe-init-orgx-watch!
-  (memoize
-   (fn []
-     (let [service (watch-service/watch config/*blog-dir*)
+(defonce ensure-orgx-watch!
+  (call-once!
+   (fn [blog-dir]
+     (let [service (watch-service/watch blog-dir)
            [resp _] service]
        {:service service
         :future (future
@@ -85,12 +86,12 @@
                           (logging/warn "Generated orgx file failed" t)))
                       (recur (a/<!! resp)))))}))))
 
-(defn stop-orgx-watch! []
-  (let [[_ cancel] (:service (maybe-init-orgx-watch!))]
+(defn stop-orgx-watch! [blog-dir]
+  (let [[_ cancel] (:service (ensure-orgx-watch! blog-dir))]
     (a/>!! cancel true)))
 
 (defn start-server! []
   (check/environment-check)
   (generate-all-orgx!)
-  (maybe-init-orgx-watch!)
+  (ensure-orgx-watch! config/*blog-dir*)
   (reset! jetty (jetty/run-jetty (-> #'app (wrap-file "./public") (wrap-content-type)) {:port 3001 :join? false})))
