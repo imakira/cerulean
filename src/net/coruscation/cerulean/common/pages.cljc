@@ -12,7 +12,7 @@
    [net.coruscation.cerulean.router :as router]
    [net.coruscation.cerulean.utils :refer
     [#?@(:cljs [obj->clj]) use-asset use-context use-orgx
-     use-user-config] :as utils]
+     use-precalculated use-user-config] :as utils]
    [uix.core :as uix :refer
     [$ #?@(:cljs [lazy suspense]) defui use-effect use-memo
      use-ref use-state]]))
@@ -222,16 +222,17 @@
                      published-date description
                      orgx] :as blog-asset}
         (use-asset (str "blog/" id))
-
-        toc-content (use-memo
-                     (fn []
-                       #?(:cljs (if show-toc? (let [dummy (.createElement js/document "html")]
-                                                (set! (.-innerHTML dummy)
-                                                      content)
-                                                (generate-toc-from-element dummy))
-                                    nil)
-                          :clj (generate-toc-from-html-string content)))
-                     [content show-toc?])
+		toc-content (use-precalculated id
+                      ;; In some case, `generate-toc-from-html-string` (in clj) and
+                      ;;   `generate-toc-from-element` in cljs produces slightly different results.
+                      ;; The following code will choose clj, if server rendered, and cljs version if client rendered.
+                      ;; Thus workaround the problem.
+                      (fn [] #?(:clj (generate-toc-from-html-string content)))
+                      (fn [] #?(:cljs (if show-toc? (let [dummy (.createElement js/document "html")]
+                                                      (set! (.-innerHTML dummy)
+                                                            content)
+                                                      (generate-toc-from-element dummy))
+                                          nil))))
         doc-ref (use-ref nil)
         [current-header-id set-current-header-id!] (use-state nil)]
     (utils/set-title! (str title " | " (use-user-config :title)))
