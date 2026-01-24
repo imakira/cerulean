@@ -1,5 +1,7 @@
 (ns net.coruscation.cerulean.render.context
-  (:require [net.coruscation.cerulean.render.context-commons :refer :all]))
+  (:require
+   [clojure.edn :as edn]
+   [net.coruscation.cerulean.render.context-commons :refer :all]))
 
 (def ^:dynamic *context* (atom {}))
 
@@ -13,6 +15,13 @@
   (swap! *context*
          assoc-in [:assets k]
          v))
+
+;; TODO: unify put-edn! and add-asset!
+(defn put-edn! [k v]
+  (add-assets! k (prn-str v)))
+
+(defn get-edn [k]
+  (edn/read-string (get @*context* k)))
 
 (defn add-extra-script! [id module]
   (swap! *context* update-in

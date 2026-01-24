@@ -7,13 +7,15 @@
    #?@(:clj [[net.coruscation.cerulean.server.assets :as assets]
              [reitit.core :as r]
              [hickory.zip :as hzip]
-             [net.coruscation.cerulean.orgx.orgx :as orgx]
-             [net.coruscation.cerulean.render.context :as render-context]])
+             [net.coruscation.cerulean.render.context :as render-context]
+             [clojure.tools.logging :as logging]])
    [clojure.core.async :as a]
+   [clojure.edn :as edn]
+   [clojure.string :as str]
    [clojure.zip :as zip]
    [net.coruscation.cerulean.orgx.orgx-commons :as orgx-commons]
    [net.coruscation.cerulean.render.context-commons :as render-context-commons])
-  #?(:cljs (:require-macros [net.coruscation.cerulean.utils :refer [use-context context-binding defcontext if-cljs cljc-case]]))
+  #?(:cljs (:require-macros [net.coruscation.cerulean.utils :refer [use-context context-binding defcontext if-cljs cljc-case use-precalculated]]))
   #?(:cljs (:import
             [goog.async Debouncer Throttle])))
 
@@ -233,3 +235,23 @@
                (.-documentElement)
                (.-style)
                (.setProperty var value))))
+
+#?(:clj (defn get-ident [env form]
+          (let [ns (or (-> env :ns :name) (ns-name *ns*))
+                {:keys [line column]} (meta form)
+                ident (str (-> ns (str/replace "." "-")) "-" line "-" column)]
+            ident)))
+
+#?(:clj (defmacro use-precalculated
+          [id & [calculate fallback]]
+          (let [ident (get-ident &env &form)]
+            (if (cljs-env? &env)
+              `(let [calculated# (aget js/globalThis (str ~ident ~id))]
+                 (if (~'undefined? calculated#)
+                   (~fallback)
+                   (edn/read-string calculated#)))
+              `(do
+                 (let [result# (~calculate)]
+                   (render-context/put-edn! (str ~ident ~id) result#)
+                   result#))))))
+
