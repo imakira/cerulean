@@ -68,23 +68,32 @@
      (let [service (watch-service/watch blog-dir)
            [resp _] service]
        {:service service
-        :future (future
-                  (loop [event (a/<!! resp)]
-                    (when (not (nil? event))
-                      (try
-                        (when (and (instance? Path (:path event))
-                                   (.endsWith (.toString (:path event)) ".org"))
-                          (generate-all-orgx!)
-                          (cond (= (:kind event)
-                                   :entry-create)
-                                (api/watch-compile-all!)
+        :thread
+        ;; Do not use a threadpool (i.e. future)
+	    ;;
+        ;; The caller should ensure its current ClassLoader is a DynamicClassLoader
+        ;; If we use a threadpool, the following code may executed in an preexisting thread,
+        ;;   and its ContextClassLoader will not inherit the caller's ClassLoader.
+        ;; It is mostly a problem when doing unit test though.
+        (doto (Thread/new
+               (bound-fn []
+                 (loop [event (a/<!! resp)]
+                   (when (not (nil? event))
+                     (try
+                       (when (and (instance? Path (:path event))
+                                  (.endsWith (.toString (:path event)) ".org"))
+                         (generate-all-orgx!)
+                         (cond (= (:kind event)
+                                  :entry-create)
+                               (api/watch-compile-all!)
 
-                                ;; necessary for some unknown reason
-                                *in-cli?*
-                                (api/watch-compile! :app)))
-                        (catch Throwable t
-                          (logging/warn "Generated orgx file failed" t)))
-                      (recur (a/<!! resp)))))}))))
+                               ;; necessary for some unknown reason
+                               *in-cli?*
+                               (api/watch-compile! :app)))
+                       (catch Throwable t
+                         (logging/warn "Generated orgx file failed" t)))
+                     (recur (a/<!! resp))))))
+          (.start))}))))
 
 (defn stop-orgx-watch! [blog-dir]
   (let [[_ cancel] (:service (ensure-orgx-watch! blog-dir))]
