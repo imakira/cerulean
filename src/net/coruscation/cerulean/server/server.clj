@@ -83,13 +83,9 @@
                        (when (and (instance? Path (:path event))
                                   (.endsWith (.toString (:path event)) ".org"))
                          (generate-all-orgx!)
-                         (cond (= (:kind event)
+                         (when (= (:kind event)
                                   :entry-create)
-                               (api/watch-compile-all!)
-
-                               ;; necessary for some unknown reason
-                               *in-cli?*
-                               (api/watch-compile! :app)))
+                           (api/watch-compile-all!)))
                        (catch Throwable t
                          (logging/warn "Generated orgx file failed" t)))
                      (recur (a/<!! resp))))))
