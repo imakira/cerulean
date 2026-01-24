@@ -45,3 +45,5 @@ jobs:
 
       - name: release
         run: make ci-release-nightly
+        env:
+          CERULEAN_PASSPHRASE: ${{ secrets.CERULEAN_PASSPHRASE }}
