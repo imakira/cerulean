@@ -1,0 +1,16 @@
+* Writting a Blog
+
+** Metadata
+
+A blog file supported the following metadata:
+
++ DATE :: published date, could be in the format of <2026-01-24 Sat> or a ISO 8601 timestamp like 2026-01-23T20:30:30Z
++ PUBLISHED_DATE :: has the same format as DATE, takes priority over *DATE*
++ MODIFIED_DATE :: last modified date, has the same format as *DATE*
++ TITLE :: title of the blog, the sanitized version of the title also served as the unique id of the blog.
++ CATEGORY :: category
++ ORGX :: more about orgx on [[https://coruscation.net/blogs/something-like-mdx-but-with-clojure-and-org-mode-for-my-personal-blog--part-i.html][Something Like MDX but with Clojure and Org-Mode for My Personal Blog: Part I]]
+
+  #+begin_comment
+  If published date or modified date are not presented, they are determinnted using a heuristic method. Namely through git commit history (if present) or linux file ~stat~.
+  #+end_comment

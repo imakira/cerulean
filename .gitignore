@@ -26,7 +26,6 @@ note.org
 .cache
 .clj-kondo
 /orgx
-/docs
 .cljc
 /result
 /workspace
