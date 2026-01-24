@@ -4,14 +4,15 @@ on: [push]
 
 jobs:
     build:
-        environment: env
         runs-on: ubuntu-latest
         steps:
-            - uses: nixbuild/nix-quick-install-action@v30
+            - uses: actions/checkout@v3
+            - name: Install Nix
+              uses: cachix/install-nix-action@v17
               with:
-                nix_conf: |
-                  keep-env-derivations = true
-                  keep-outputs = true
+                extra_nix_config: |
+                  access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
             - name: Restore and save Nix store
               uses: nix-community/cache-nix-action@v6
               with:
@@ -35,20 +36,7 @@ jobs:
                 # except any version with the key that is the same as the `primary-key`
                 purge-primary-key: never
 
-            - uses: actions/checkout@v3
-            - name: Install Nix
-              uses: cachix/install-nix-action@v17
-              with:
-                extra_nix_config: |
-                  access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-
-            - name: Set git name 
-              run: git config --global user.name "cerulean-ci"
-
-            - name: Set git email
-              run: git config --global user.email "ci@coruscation.net"
-
             - name: Running Tests
               shell: 'nix develop .#ci -c bash -e {0}'
-              run: make test-all
+              run: make ci-test-all
 
