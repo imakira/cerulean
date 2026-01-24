@@ -120,7 +120,7 @@ html, body, #root {
     }
 
     code {
-        @apply text-[#222222] text-[1.125rem] inline-block mx-[0.125rem];
+        @apply text-[#222222] text-[95%] inline-block mx-[0.125rem];
     }
 
     .org-svg {

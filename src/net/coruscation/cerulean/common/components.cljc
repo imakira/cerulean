@@ -24,7 +24,7 @@
 (defui tabs [{:keys [tab-list default-table class]}]
   (let [[selected-tab set-selected-tab!] (use-state (or default-table
                                                         (:name (first tab-list))))]
-    ($ :section.my-4.relative.border-sky-300.border-l-2.border-l-neutral-100 {:class class}
+    ($ :section.my-4.relative.border-1.border-neutral-100 {:class class}
        (when (not *rss*)
          ($ :div.my-0.flex.relative.bg-neutral-100
             (map (fn [{:keys [name]}]
@@ -37,7 +37,7 @@
                                       (set-selected-tab! name)))}
                       name))
                  tab-list)))
-       ($ :div.my-0.bg-neutral-50.overflow-hidden.px-2.h-full
+       ($ :div.my-0.overflow-hidden.px-2.h-full
           (mapv (fn [{:keys [name content]}]
                   ($ :div {:key name
                            :class (when-not (= selected-tab name)
