@@ -15,7 +15,7 @@
    [clojure.zip :as zip]
    [net.coruscation.cerulean.orgx.orgx-commons :as orgx-commons]
    [net.coruscation.cerulean.render.context-commons :as render-context-commons])
-  #?(:cljs (:require-macros [net.coruscation.cerulean.utils :refer [use-context context-binding defcontext if-cljs cljc-case ident-clj-cljs use-precalculated]]))
+  #?(:cljs (:require-macros [net.coruscation.cerulean.utils :refer [use-context context-binding defcontext if-cljs cljc-case use-precalculated]]))
   #?(:cljs (:import
             [goog.async Debouncer Throttle])))
 
