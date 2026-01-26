@@ -45,6 +45,7 @@ jobs:
           ref: master
 
       - name: release
+        shell: 'nix develop .#ci -c bash -e {0}'
         run: make ci-release-nightly
         env:
           CERULEAN_PASSPHRASE: ${{ secrets.CERULEAN_PASSPHRASE }}
