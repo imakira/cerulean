@@ -2,11 +2,10 @@ name: nightly
 
 on:
   schedule:
-    - cron: "30 01 * * *"
+    - cron: "13 15 * * *"
 jobs:
   nightly_release:
     environment: env
-    name: nightly release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
