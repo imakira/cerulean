@@ -3,6 +3,8 @@ name: nightly
 on:
   schedule:
     - cron: "13 15 * * *"
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
 jobs:
   nightly_release:
     environment: env
