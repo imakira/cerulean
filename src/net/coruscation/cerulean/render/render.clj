@@ -7,12 +7,14 @@
    [net.coruscation.cerulean.common.pages :as pages]
    [net.coruscation.cerulean.render.context :refer [with-new-context] :as render-context]
    [net.coruscation.cerulean.render.context-commons :refer [extra-script-global-this-name]]
+   [net.coruscation.cerulean.server.user-config :refer [get-user-config]]
    [net.coruscation.cerulean.utils :refer [use-user-config]]
    [uix.core :refer [$]]
    [uix.dom.server :as dom.server]))
 
 (defn template [inner serialized-assets
                 & {:keys [ssr? server-url
+                          cloudflare-analytics-token
                           description
                           title
                           extra-scripts]
@@ -67,7 +69,11 @@
                        (raw-string "import * as exps  from '/js/" module "';\n")
                        (raw-string "window['" (extra-script-global-this-name id) "'] = exps;")]))
               extra-scripts)
-         [:script {:src "/js/main.js" :type "module" :defer true}]]])))
+         [:script {:src "/js/main.js" :type "module" :defer true}]
+         (when cloudflare-analytics-token
+           [:script {:defer true
+                     :src "https://static.cloudflareinsights.com/beacon.min.js"
+                     :data-cf-beacon  (cheshire.core/generate-string {:token cloudflare-analytics-token})}])]])))
 
 (def ^:dynamic *serialized-assets* (atom {}))
 
@@ -84,7 +90,9 @@
                 :ssr? true :server-url "/"
                 :description description
                 :title title
-                :extra-scripts extra-scripts))))
+                :extra-scripts extra-scripts
+                :cloudflare-analytics-token (:token (get-user-config
+                                                     :cloudflare-analytics))))))
 
 (defn dev-template [{:keys [uri http-roots http-config] :as req}]
   {:status 200
